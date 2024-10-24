@@ -1,0 +1,8 @@
+.loader {
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.loader.active {
+  display: flex;
+}

@@ -1,0 +1,117 @@
+:root {
+  /* colors */
+
+  --background: rgb(197, 197, 197);
+
+  /* text */
+  --color-active: #0058af;
+  --color-main:#686868;
+  --color-error:#a00a0a;
+  --color-click:rgb(201, 201, 201);
+  --text-color-header: #003366;
+  --text-color-main: var(--color-main);
+  --text-color-error: var(--color-error);
+  --text-light-theme-light: #222222;
+  --text-dark-theme-dark:#E6E6E6;
+  --text-light-theme-light:#FFFFFF;
+
+  --transition: 0.3s;
+  --transition-fast: 0.1s;
+  --transition-long: 0.5s;
+
+  --text-dark:var(--text-dark-theme-light);
+  --text-light:var(--text-light-theme-light);
+
+  /* font-families */
+  --font-normal: "Inter", sans-serif;
+
+}
+
+body {
+  margin: 0;
+  width:100%;
+  height:100%;
+  background-color: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.text {
+  font-family: "Comfortaa";
+  display: block;
+  display: -webkit-box;
+}
+
+.text_type_header {
+  font-size: 64px;
+  font-weight: 100;
+  color:var(--text-color-header);
+}
+
+.text_type_main {
+  font-size: 18px;
+  font-weight: 100;
+  line-height: 1.5;
+  color:var(--text-color-main);
+}
+
+.text_type_medium {
+  font-size: 18px;
+  font-weight: 100;
+  color:var(--text-color-main);
+}
+
+.text_type_message {
+  font-size: 18px;
+  font-weight: 100;
+  color:black;
+}
+
+.text_type_active {
+  color:var(--color-active);
+}
+
+.text_type_error {
+  font-size: 14px;
+  font-weight: 100;
+  color:var(--color-error);
+}
+
+.text_weight_bold {
+  font-weight: bold;
+}
+
+/* Стилизация табов */
+.ant-tabs-ink-bar {
+  display: none;
+}
+
+.ant-tabs-nav::before {
+  border-bottom: none !important;
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: inherit;
+}
+
+.ant-tabs-tab {
+  font-family: "Comfortaa";
+  font-size: 24px !important;
+
+  &.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: var(--color-active) !important; 
+    font-weight: bold;
+  }
+}
+
+.ant-tabs-tab:hover .ant-tabs-tab-btn {
+  color: var(--color-active) !important; 
+}
