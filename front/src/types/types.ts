@@ -24,6 +24,19 @@ export interface IQuestion {
   res_ans?: TId;
 }
 
+export interface IApiResponseAnswer {
+  id: TId;
+  text_a: string;
+}
+
+export interface IApiResponseQuestion {
+  id: TId;
+  text_q: string;
+  ans: IApiResponseAnswer[];
+  owner: boolean;
+  res_ans?: TId;
+}
+
 export type TCreateQuestionBody = {
   text_q: string;
   ans: string[];
@@ -77,3 +90,10 @@ export type AppThunk<TReturn = void> = ActionCreator<
 
 // Типизация метода dispatch для проверки на валидность отправляемого экшена
 export type AppDispatch = typeof store.dispatch;
+
+export type TApiAnswer = {
+  status:string,
+  data:any
+}
+
+export type TGetVotes = TId[];

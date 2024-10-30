@@ -1,4 +1,5 @@
-export const API = 'http://localhost:3001';
+export const API = 'http://localhost:3001/api';
+export const URL_GET_API = 'https://api.ipify.org?format=json';
 
 export const INPUT_QUESTION_NAME:'QUESTION'='QUESTION';
 export const INPUT_ANSWER_NAME:'ANSWER'='ANSWER';

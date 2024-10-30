@@ -1,4 +1,4 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent } from 'react';
 import styles from "./create.module.css";
 import { Input } from '../ui/input/input';
 import { AddIcon } from '../ui/icons/add-icon';
@@ -40,10 +40,8 @@ export const Create: FC = () => {
 
   const dispatch = useDispatch();
   
-  const { createRequest, createSuccess, createFailed, ipUser } = useStore(
+  const { createRequest,ipUser } = useStore(
     'createRequest',
-    'createSuccess',
-    'createFailed',
     'ipUser'
   );
 

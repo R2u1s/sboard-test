@@ -1,4 +1,4 @@
-import { IQuestion, TId, TInputElement, TInputValues } from "../types/types";
+import { IApiResponseAnswer, IQuestion, TAnswer, TId, TInputElement, TInputValues, TVotes } from "../types/types";
 import { INPUT_ANSWER_NAME, INPUT_QUESTION_NAME } from "./constants";
 
 export function isQuestionAnswered(obj: IQuestion): TId | null {
@@ -39,20 +39,36 @@ export function isAnswerCorrect(questions: IQuestion[], id_q: TId, id: TId): boo
   return foundQuestion ? foundQuestion.res_ans === id : false;
 }
 
-
-type InputObject = {
-  [INPUT_ANSWER_NAME]: string;
-  [key: string]: string;
-};
-
 export function extractAnswers(input: TInputValues): string[] {
   const answers: string[] = [];
 
   for (const key in input) {
     if (key.startsWith(INPUT_ANSWER_NAME)) {
-      answers.push(input[key]);
+      const answer = input[key];
+      // Проверяем, что строка непустая
+      if (answer && answer.trim() !== '') {
+        answers.push(answer);
+      }
     }
   }
 
   return answers;
+}
+
+export function transformAnswerResponse(inputArray: IApiResponseAnswer[]): TAnswer[] {
+  return inputArray.map(item => ({
+      id_a: item.id,
+      text_a: item.text_a
+  }));
+}
+
+export function filterVotesByAns<T>(ans: TAnswer[], votes: TVotes): TVotes {
+  const ids = ans.map(item => item.id_a);
+  
+  return Object.keys(votes)
+    .filter(key => ids.includes(key))
+    .reduce((acc, key) => {
+      acc[key] = votes[key];
+      return acc;
+    }, {} as TVotes);
 }

@@ -1,5 +1,6 @@
 .line {
   margin:0;
+  max-width: 100%;
   display:flex;
   flex-flow: row;
   justify-content: flex-start;

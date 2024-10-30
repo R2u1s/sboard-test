@@ -1,7 +1,8 @@
 .question {
   margin: 0 auto;
   padding: 0;
-  width:100%;
+  width: 100%;
+  min-width: 470px;
   display: flex;
   background-color: white;
   flex-direction: column;
@@ -12,18 +13,20 @@
   cursor: pointer;
   overflow: hidden;
   text-align: start;
-  color:white;
+  color: white;
   box-sizing: border-box;
 }
 
 .question__text {
-  background-color:white;
+  max-width: 100%;
+  background-color: white;
   transition: background-color var(--transition), color var(--transition);
 }
 
 .question__text:hover {
-  background-color: rgb(221, 221, 221); /* Затемнение при наведении */
-  color:rgb(221, 221, 221);
+  background-color: rgb(221, 221, 221);
+  /* Затемнение при наведении */
+  color: rgb(221, 221, 221);
 }
 
 .question_status_answered {
@@ -31,19 +34,20 @@
 }
 
 .question__third {
-  min-width: 64px;
+  min-width: 90px;
   min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  transition: transform var(--transition) ease;
 }
 
 .question__delete {
   all: unset;
   cursor: pointer;
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -56,26 +60,26 @@
 }
 
 .question__delete:active {
-  color:var(--color-click);
+  color: var(--color-click);
 }
 
 .question__votes {
-  display:block;
-  padding:0;
+  display: block;
+  padding: 0;
   padding-right: 9px;
-  margin:0;
+  margin: 0;
   min-height: 24px;
-  text-align:end;
+  text-align: end;
 }
 
 .question__error {
-  display:block;
-  padding:0;
+  display: block;
+  padding: 0;
   padding-right: 9px;
-  margin:0;
+  margin: 0;
   padding-left: 15px;
   min-height: 24px;
-  text-align:start;
+  text-align: start;
 }
 
 .arrow {
@@ -91,19 +95,21 @@
 }
 
 .list {
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
   list-style: none;
   display: flex;
   flex-flow: column;
-  gap:10px;
+  gap: 10px;
+  min-width: 470px;
 }
 
 .list__elem {
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
   transition: background-color var(--transition), color var(--transition);
-  color:white;
+  color: white;
   transition: transform var(--transition) ease;
 }
 
@@ -117,14 +123,29 @@
 }
 
 .list__elem:hover {
-  background-color: rgb(221, 221, 221); /* Затемнение при наведении */
-  color:rgb(221, 221, 221);
+  background-color: rgb(221, 221, 221);
+  /* Затемнение при наведении */
+  color: rgb(221, 221, 221);
 }
 
 .list__text {
-  margin:0;
-  padding:0;
+  display: block;
+  margin: 0;
+  padding: 0;
+  max-width: 560px;
+  min-width: 320px;
+  width: auto;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
   transition: transform var(--transition-fast) ease;
+}
+
+@media screen and (max-width: 750px) {
+  .list__text {
+    max-width: calc(100vw - 190px);
+  }
 }
 
 .list__text:active {
@@ -143,6 +164,10 @@
 }
 
 .loader__color {
-  color:var(--color-main);
+  color: var(--color-main);
 }
 
+.question__vote_highlight {
+  transform: scale(1.2);
+  font-weight: bold;
+}

@@ -1,17 +1,15 @@
-import { FC, useState, useCallback, useEffect } from 'react';
+import { FC, useState, useCallback, useEffect, useMemo } from 'react';
 import styles from "./question.module.css";
 import { Line } from '../line/line';
 import { ArrowIcon } from '../ui/icons/arrow-icon';
 import { IQuestionProps, TId } from '../../types/types';
-import { isAnswerCorrect, isQuestionAnswered } from '../../utils/helpers';
+import { filterVotesByAns, isAnswerCorrect, isQuestionAnswered } from '../../utils/helpers';
 import { Check } from '../check/check';
 import { Loader } from '../loader/loader';
 import { DeleteIcon } from '../ui/icons/delete-icon';
-import { mockVotesList } from '../../utils/mock';
 import { useStore } from '../../services/hooks';
 import { useDispatch } from '../../services/hooks';
-import { postAnswer, deleteQuestion } from '../../services/actions/store';
-import { TEXT_MESSAGE_DELETE_FAIL } from '../../utils/constants';
+import { postAnswer, deleteQuestion, addAnswerIdsList,removeAnswerIdsList, clearChosen, clearHighlight } from '../../services/actions/store';
 
 export const Question: FC<IQuestionProps> = ({ question }) => {
 
@@ -19,23 +17,46 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
 
   const [show, setShow] = useState<boolean>(false);
   const [answered, setAnswered] = useState<TId | null>(isQuestionAnswered(question));
+  const [highlight, setHighlight] = useState<boolean>(false);
 
-  const { questions, answerRequest, answerSuccess, answerFailed, ipUser, votes, chosen, deleteRequest, deleteSuccess, deleteFailed } = useStore(
+  const { questions, answerRequest, answerSuccess, ipUser, votes, chosen, deleteRequest,hightLightAnswerVote } = useStore(
     'questions',
     'answerRequest',
     'answerSuccess',
-    'answerFailed',
     'deleteRequest',
-    'deleteSuccess',
-    'deleteFailed',
     'ipUser',
     'votes',
-    'chosen'
+    'chosen',
+    'hightLightAnswerVote'
   );
 
+  //мемоизируем объект с голосами
+  const memoizedVotes = useMemo(()=>{
+    return filterVotesByAns(question.ans,votes);
+  },[question.ans,votes]);
+
+  //таймер - для стилизации изменяющегося количества голосов
+  useEffect(() => {
+    if (hightLightAnswerVote.length > 0) {
+      setHighlight(true);
+
+      const timer = setTimeout(() => {
+        setHighlight(false);
+        dispatch(clearHighlight());
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hightLightAnswerVote, dispatch]);
+
   const onExpandHandler = useCallback(() => {
+    if (!show && answered) {
+      dispatch(addAnswerIdsList(question.ans.map(item => item.id_a)));
+    } else if (show && answered) {
+      dispatch(removeAnswerIdsList(question.ans.map(item => item.id_a)));
+    }
     setShow(prev => !prev);
-  }, [setShow]);
+  }, [setShow,answered,dispatch,question.ans,show]);
 
   const onAnswerClick = (id: TId) => {
     dispatch(postAnswer({
@@ -47,7 +68,7 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
 
   const onDeleteClick = (e:React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    question.owner && dispatch(deleteQuestion(question.id_q));
+    question.owner && dispatch(deleteQuestion(question.id_q,ipUser));
   }
 
   useEffect(() => {
@@ -59,9 +80,10 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
     if (answerSuccess && chosen && question.ans.some(item => item.id_a === chosen)) {
       if (isAnswerCorrect(questions, question.id_q, chosen)) {
         setAnswered(isQuestionAnswered(question));
+        dispatch(clearChosen());
       } 
     }
-  }, [questions]);
+  }, [questions,answerSuccess,chosen,question,dispatch]);
 
   return (
     <div className={`${styles.question} ${answered && styles.question_status_answered}`}>
@@ -69,19 +91,19 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
       <div className={styles.question__text} onClick={onExpandHandler}>
         <Line
           firstComponent={<ArrowIcon extraClass={`${styles.arrow} ${!show && styles.arrow_status_inactive}`} />}
-          secondComponent={<p className={`${styles.list__text} text text_type_main ${answered && 'text_weight_bold text_type_active'}`}>{question.text_q}</p>}
+          secondComponent={<p className={`${styles.list__text} text text_type_main text_weight_bold ${answered && 'text_type_active'}`}>{question.text_q}</p>}
           thirdComponent={question.owner &&
             <div className={`${styles.question__third} text text_type_main`}>
-              {deleteRequest ? <Loader extraClass={styles.loader__color} /> : <button className={styles.question__delete} onClick={onDeleteClick}><DeleteIcon /></button>}
+              {deleteRequest ? chosen === question.id_q && <Loader extraClass={styles.loader__color} /> : <button className={styles.question__delete} onClick={onDeleteClick}><DeleteIcon /></button>}
             </div>}
         />
       </div>
       {/* Ответы */}
       {show && answered &&
         <p className={`${styles.question__votes} text text_type_medium`}>
-          Votes
+          Голосов
         </p>}
-      <ul className={`${styles.list} ${show ? styles.question_expanded_open : styles.question_expanded_close}`}>
+      {question && question.ans && <ul className={`${styles.list} ${show ? styles.question_expanded_open : styles.question_expanded_close}`}>
         {question.ans.map((item) => {
           return (
             <li className={styles.list__elem} key={item.id_a} onClick={() => { !answered && onAnswerClick(item.id_a) }}>
@@ -91,15 +113,15 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
                   <p className={`${styles.list__text} text text_type_medium ${answered === item.id_a && 'text_weight_bold text_type_active'}`}>
                     {item.text_a}
                   </p>}
-                thirdComponent={show &&
-                  <div className={`${styles.question__third} text text_type_main`}>
-                    {chosen === item.id_a && answerRequest ? <Loader extraClass={styles.loader__color} /> : answered && votes[item.id_a] || '0'}
+                thirdComponent={show && 
+                  <div className={`${styles.question__third} ${highlight && hightLightAnswerVote.includes(item.id_a) && styles.question__vote_highlight} text text_type_main`}>
+                    {chosen === item.id_a && answerRequest ? <Loader extraClass={styles.loader__color} /> : answered && (memoizedVotes[item.id_a] || 0)}
                   </div>}
               />
             </li>
           )
         })}
-      </ul>
+      </ul>}
     </div>
   );
 }

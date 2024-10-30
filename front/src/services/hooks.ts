@@ -1,11 +1,9 @@
 import {
-  TypedUseSelectorHook,
   useDispatch as dispatchHook
 } from 'react-redux';
-import { useMemo } from 'react';
-import { AppDispatch, AppThunk, RootState } from '../types/types';
+import { AppDispatch, AppThunk } from '../types/types';
 import { TState } from './reducers/store';
-import { useSelector } from 'react-redux';
+import { useSelector,shallowEqual } from 'react-redux';
 
 // Теперь этот хук знает структуру хранилища
 // export const useSelector: TypedUseSelectorHook<RootState> = selectorHook;
@@ -17,13 +15,16 @@ export const useDispatch = () => dispatchHook<AppDispatch & AppThunk>();
 // Если не обернуть в Memo то будет предупреждение о создании новой ссылки при каждом обращении
 // и предлагается мемоизировать селекторы
 export const useStore = <K extends keyof TState>(...keys: K[]) => {
-  const storeSlice = useSelector((state: { store: TState }) => state.store);
+  const selectedSlice = useSelector(
+    (state: { store: TState }) => {
+      return keys.reduce((result, key) => {
+        result[key] = state.store[key];
+        return result;
+      }, {} as Pick<TState, K>);
+    },
+    shallowEqual
+  );
 
-  return useMemo(() => {
-    return keys.reduce((result, key) => {
-      result[key] = storeSlice[key];
-      return result;
-    }, {} as Pick<TState, K>);
-  }, [storeSlice, ...keys]);
+  return selectedSlice;
 };
 
