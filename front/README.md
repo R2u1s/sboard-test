@@ -1,46 +1,25 @@
-# Getting Started with Create React App
+# sBoard test
+Платформа для создания интерактивных опросов [Перейти на сайт](http://77.238.250.70/sboard/) 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![screenshot](https://github.com/R2u1s/sboard-test/blob/main/gh.JPG)
+## Технологии
+* Javascript, React, Typescript
+* Redux
+* Node.js, Express, NestJS, PostgreSQL
 
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Функциональность
+* Просмотр списка всех опросов
+* Создание нового опроса с вопросом и вариантами ответов
+* Возможность голосовать в опросах
+* Отображение результатов голосования - количество голосов за каждый вариант
+* Количество голосов обновляется в режиме реального времени
+* Удаление созданного опроса владельцем (владение определяется по ip)
+#### Оценить работу проекта можно
+* По ссылке выше
+* Запустив локально с использованием docker:
+Тут инструкция по запуску проекта через docker
+* По отдельности фронтенд и бэкенд запускаются с помощью команды npm i && npm run start. Для корректной работы базы данных, можно использовать файл backup, лежащий в корне репозитория, либо посмотреть настройки в файле .env в разделе back
+#### Проект
+выполнен в рамках тестового задания на позицию fullstack разработчика
+#### Текст задания
+[Можно посмотреть здесь](https://docs.google.com/document/d/1HRnsev0iuCh3vAtN9ofy-I0USUaqptJHFXElrbW7jTA/edit?tab=t.0#heading=h.fg8txlktlwhq)
