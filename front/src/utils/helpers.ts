@@ -1,4 +1,4 @@
-import { IApiResponseAnswer, IQuestion, TAnswer, TId, TInputElement, TInputValues, TVotes } from "../types/types";
+import { IApiResponseAnswer, IApiResponseQuestion, IQuestion, TAnswer, TId, TInputElement, TInputValues, TVotes } from "../types/types";
 import { INPUT_ANSWER_NAME, INPUT_QUESTION_NAME } from "./constants";
 
 export function isQuestionAnswered(obj: IQuestion): TId | null {
@@ -60,6 +60,25 @@ export function transformAnswerResponse(inputArray: IApiResponseAnswer[]): TAnsw
       id_a: item.id,
       text_a: item.text_a
   }));
+}
+
+//функция меняет названия ключей id на id_q, и в результирующий массив добавляет только те элементы,
+//которых не было в исходном массиве storageQuestions
+export function transformQuestionsResponse(
+  inputArray: IApiResponseQuestion[],
+  storageQuestions: IQuestion[]
+): IQuestion[] {
+  const existingIds = new Set(storageQuestions.map(item => item.id_q));
+
+  return inputArray
+    .filter(item => !existingIds.has(item.id))
+    .map(item => ({
+      id_q: item.id,
+      text_q: item.text_q,
+      ans: transformAnswerResponse(item.ans),
+      owner: item.owner,
+      res_ans: item.res_ans
+    }));
 }
 
 //

@@ -23,6 +23,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+      {/* Router используется для возможности запуска на виртуальном сервере, чтобы адрес был http://77.238.250.70/sboard/ */}
       <Router basename="/sboard">
         <App />
       </Router>

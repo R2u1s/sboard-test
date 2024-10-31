@@ -1,4 +1,4 @@
-import { FC, useMemo, useState, useEffect,useCallback } from 'react';
+import { FC, useMemo, useEffect, useRef, useState } from 'react';
 import styles from "./main.module.css";
 import { Question } from '../question/question';
 import { Tabs } from 'antd';
@@ -6,67 +6,57 @@ import { Create } from '../create/create';
 import { Loader } from '../loader/loader';
 import { useStore } from '../../services/hooks';
 import { IQuestion } from '../../types/types';
+import { useDispatch } from '../../services/hooks';
+import { getQuestionsAndIp } from '../../services/actions/store';
+import { OFFSET } from '../../utils/constants';
 
 export const Main: FC = () => {
 
-  const { questions, questionsRequest, questionsSuccess, questionsFailed } = useStore(
+  const dispatch = useDispatch();
+
+  const { questions, total, questionsRequest, questionsSuccess, questionsFailed } = useStore(
     'questions',
+    'total',
     'questionsRequest',
     'questionsSuccess',
     'questionsFailed'
   );
 
-  /* Реализация подсчета высоты экрана, чтобы рассчитать сколько влезет элементов списка */
-  const [windowHeight, setWindowHeight] = useState<number>(window.innerHeight);
+  const [page,setPage] = useState<number>(0);
+
+  const loaderRef = useRef(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && total > page*OFFSET) {
+          setPage(prev => prev + 1);
+          dispatch(getQuestionsAndIp(page + 1, OFFSET));
+        }
+      },
+      { threshold: 1.0 }
+    );
 
-    window.addEventListener('resize', handleResize);
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  /* ----------------------------------------------------------------------------------- */
-
-  /* Реализация рендера по скроллу. 250 это высота блока над списком, 52 высота элемента списка */
-  const [qtyToShow, setQtyToShow] = useState<number>(Math.max(12, Math.floor((windowHeight - 250) / 52)));
-
-  const handleScroll = useCallback((event: Event) => {
-    const target = event.target as Document;
-    const documentElement = target.documentElement;
-
-    if (documentElement) {
-      const { scrollTop, clientHeight, scrollHeight } = documentElement;
-
-      if (scrollHeight - scrollTop > clientHeight - 1 && scrollHeight - scrollTop < clientHeight + 1) {
-        questions.length > qtyToShow && setQtyToShow(prev => prev + 10);
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
       }
-    }
-  },[qtyToShow,questions.length]);
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, true);
-    return () => window.removeEventListener('scroll', handleScroll, true);
-  }, [questions, qtyToShow,handleScroll]);
-  /* ----------------------------------------------------------------------------------- */
+    };
+  }, [dispatch,questions]);
 
   // Мемоизируем список вопросов
   const memoizedQuestions = useMemo(() => {
 
-    if (questionsRequest || !questionsSuccess) {
-      return null;
-    }
-    return questions && questions.length > 0 ? questions.map((item: IQuestion, index) => (
-      index < qtyToShow && <li className={styles.list__elem} key={item.id_q}>
+    return questions && questions.length > 0 ? questions.map((item: IQuestion) => (
+      <li className={styles.list__elem} key={item.id_q}>
         <Question question={item} />
       </li>
     )) : 'Не удалось найти вопросы';
-  }, [questions, questionsRequest, questionsSuccess,qtyToShow]);
+  }, [questions, questionsRequest, questionsSuccess]);
 
   return (
     <main className={styles.content}>
@@ -78,12 +68,19 @@ export const Main: FC = () => {
             key: '1',
             label: 'Вопросы',
             children:
-              questionsRequest ?
+              questionsRequest && questions.length === 0 ?
                 <Loader extraClass={styles.loader__color} /> :
-                questionsSuccess ?
-                  <ul className={styles.list}>
-                    {memoizedQuestions}
-                  </ul> :
+                questionsSuccess || questions.length > 0 ?
+                  <>
+                    <ul className={styles.list}>
+                      {memoizedQuestions}
+                    </ul>
+                    {questionsRequest && questions.length > 0 ?
+                      <Loader extraClass={styles.loader__color} /> :
+                      <div ref={loaderRef} style={{ height: '20px' }} />
+                    }
+                  </>
+                  :
                   questionsFailed && 'Ошибка соединения с сервером'
           },
           {

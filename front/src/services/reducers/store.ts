@@ -1,7 +1,6 @@
-import isEqual from "lodash.isequal";
 import { IQuestion, TVotes, TId, TMessage } from "../../types/types"
 import { TEXT_MESSAGE_DELETE_FAIL, TEXT_MESSAGE_ANSWER_FAIL, TEXT_MESSAGE_CREATE_FAIL, TEXT_MESSAGE_IP_FAIL, TEXT_MESSAGE_DELETE_SUCCESS, TEXT_MESSAGE_CREATE_SUCCESS } from "../../utils/constants";
-import { transformAnswerResponse } from "../../utils/helpers";
+import { transformAnswerResponse, transformQuestionsResponse } from "../../utils/helpers";
 import {
   QUESTIONS_REQUEST,
   QUESTIONS_SUCCESS,
@@ -33,6 +32,7 @@ import { getDifferentKeys } from "../../utils/utils";
 
 export type TState = {
   questions: IQuestion[];
+  total: number;
   votes: TVotes;
   ipUser: string;
   chosen: TId | null,
@@ -62,6 +62,7 @@ export type TState = {
 
 const initialState: TState = {
   questions: [],
+  total: 0,
   votes: {},
   ipUser: '',
   chosen: null, //временное сохранение id выбранного ответа
@@ -108,8 +109,9 @@ export const storeReducer = (state = initialState, action: TStoreActions) => {
         questionsRequest: false,
         questionsSuccess: true,
         questionsFailed: false,
-        questions: action.data.questions,
-        votes: action.data.votes
+        questions: [...state.questions,...transformQuestionsResponse(action.data.questions,state.questions)],
+        total: action.data.total,
+        votes: {...state.votes,...action.data.votes},
       };
     }
     case QUESTIONS_FAILED: {

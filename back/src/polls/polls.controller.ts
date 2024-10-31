@@ -10,10 +10,10 @@ export class PollsController {
     private readonly pollsService: PollsService
   ) { }
 
-  @Get()
+  @Get(':page/:offset')
   @HttpCode(200)
-  async getPolls(@Headers('X-custom-ipuser') ipUser: string) {
-    return this.pollsService.getAll(ipUser);
+  async getPolls(@Param('page') page: number, @Param('offset') offset: number, @Headers('X-custom-ipuser') ipUser: string) {
+    return this.pollsService.getAll(ipUser,page,offset);
   }
 
   @Post()

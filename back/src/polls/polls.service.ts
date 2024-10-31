@@ -94,47 +94,48 @@ export class PollsService {
     };
   }
 
-  async getAll(ip: string) {
+  async getAll(ip: string, page: number, offset: number) {
     //запрос выводит все записи таблицы poll. При этом формирует массив привязанных ответов;
     //определяет по переданному ip является ли пользователь владельцем вопроса;
     //если пользователь отвечал на вопрос, то выводится id ответа;
     //также формируется массив votes - количество голосов для тех вопросов, на которые
     //пользователь давал ответ
-    const polls = await this.pollsRepository.find({
-      relations: ['ans', 'votes', 'votes.ans']
+    const [polls, total] = await this.pollsRepository.findAndCount({
+      relations: ['ans', 'votes', 'votes.ans'],
+      skip: page * offset,
+      take: offset,
+      order: {
+        createdAt: 'DESC', // Сортировка по дате
+      },
     });
-
-    polls.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-    //массив вопросов
+  
     const questions = polls.map(poll => {
       const ans = poll.ans.map(answer => ({
-        id_a: answer.id,
+        id: answer.id,
         text_a: answer.text_a,
       }));
-
+  
       const owner = poll.ipUser === ip;
-
+  
       const userVote = poll.votes.find(vote => vote.ipUser === ip && vote.ans);
-
+  
       const result: any = {
-        id_q: poll.id,
+        id: poll.id,
         text_q: poll.text_q,
         ans,
         owner,
       };
-
+  
       if (userVote) {
         result.res_ans = userVote.ans.id;
       }
-
+  
       return result;
     });
-
-    //массив голосов
+  
     const votes = polls.reduce((acc, poll) => {
       const userVote = poll.votes.find(vote => vote.ipUser === ip && vote.ans);
-
+  
       if (userVote) {
         poll.ans.forEach(answer => {
           const count = poll.votes.filter(vote => vote.ans.id === answer.id).length;
@@ -143,11 +144,11 @@ export class PollsService {
           }
         });
       }
-
+  
       return acc;
     }, {});
-
-    return { questions, votes };
+  
+    return { questions, votes, total };
   }
 
   async remove(id: string, ip: string) {

@@ -1,4 +1,4 @@
-import { AppDispatch, IApiResponseQuestion, IQuestion, TGetVotes, TPostAnswerBody, TVotes } from "../../types/types";
+import { AppDispatch, IApiResponseQuestion, TGetVotes, TPostAnswerBody, TVotes } from "../../types/types";
 import axios from "axios";
 import { API, URL_GET_API } from "../../utils/constants";
 import { IpResponse, TId, TCreateQuestionBody, TMessage } from "../../types/types";
@@ -47,7 +47,8 @@ export interface IQuestionsRequestAction { readonly type: typeof QUESTIONS_REQUE
 export interface IQuestionsSuccessAction {
   readonly type: typeof QUESTIONS_SUCCESS,
   readonly data: {
-    questions:Array<IQuestion>,
+    questions:Array<IApiResponseQuestion>,
+    total: number,
     votes:TVotes
   }
 }
@@ -158,7 +159,7 @@ export type TStoreActions =
   IClearHighlightAction;
 
 //получение списка вопросов
-export const getQuestionsAndIp = () => {
+export const getQuestionsAndIp = (page:number,offset:number) => {
   return function (dispatch: AppDispatch) {
     //Перед запросом к серверу нужно определить ip пользователя
     dispatch({
@@ -185,7 +186,7 @@ export const getQuestionsAndIp = () => {
       }) // В случае ошибки возвращаем пустую строку
       .then(userIp => {
         // Выполняем запрос к серверу с полученным IP
-        return axios.get(`${API}/polls`, {
+        return axios.get(`${API}/polls/${page}/${offset}`, {
           headers: {
             'X-custom-ipuser': userIp
           }
@@ -214,7 +215,6 @@ export const getQuestionsAndIp = () => {
 
 //отправка ответа на вопрос
 export const postAnswer = (body: TPostAnswerBody) => {
-  console.log(body);
   return function (dispatch: AppDispatch) {
     dispatch({
       type: ANSWER_REQUEST,
@@ -225,7 +225,6 @@ export const postAnswer = (body: TPostAnswerBody) => {
       ipUser: body.ipUser
     })
       .then((res) => {
-        console.log(res);
         if (res.status === 200) {
           dispatch({
             type: ANSWER_SUCCESS,
@@ -303,7 +302,6 @@ export const postQuestion = (body: TCreateQuestionBody, clearCallback: () => voi
       ipUser: body.ip
     })
       .then((res) => {
-        console.log(res);
         if (res.status === 200) {
           dispatch({
             type: CREATE_SUCCESS,

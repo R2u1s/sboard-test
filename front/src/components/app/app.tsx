@@ -6,6 +6,7 @@ import { useDispatch } from '../../services/hooks';
 import { clearMessage, getQuestionsAndIp, getVotes } from '../../services/actions/store';
 import { useStore } from '../../services/hooks';
 import Modal from '../modal/modal';
+import { OFFSET } from '../../utils/constants';
 
 export const App: FC = () => {
 
@@ -14,12 +15,17 @@ export const App: FC = () => {
   //answerIds - массив из id ответов, для которых каждые 5 секунд будет
   //запрашиваться количество голосов для отображения в режиме
   //реального времени
-  const { message, answerIds } = useStore('message', 'answerIds');
+  const { message, answerIds, questionsRequest, questionsSuccess } = useStore(
+    'message', 
+    'answerIds',
+    'questionsRequest',
+    'questionsSuccess'
+    );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getQuestionsAndIp());
+    dispatch(getQuestionsAndIp(0,OFFSET));
   }, [dispatch]);
 
   useEffect(() => {
