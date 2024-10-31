@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styles from './modal.module.css';
 import { TMessage } from '../../types/types';
@@ -40,7 +40,7 @@ const Modal: FC<TModal> = ({ content, clearCallback }) => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     }; // Очищаем таймеры при размонтировании
-  }, []);
+  }, [clearCallback]);
 
   return ReactDOM.createPortal(
     (

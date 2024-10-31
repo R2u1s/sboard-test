@@ -15,11 +15,9 @@ export const App: FC = () => {
   //answerIds - массив из id ответов, для которых каждые 5 секунд будет
   //запрашиваться количество голосов для отображения в режиме
   //реального времени
-  const { message, answerIds, questionsRequest, questionsSuccess } = useStore(
+  const { message, answerIds } = useStore(
     'message', 
-    'answerIds',
-    'questionsRequest',
-    'questionsSuccess'
+    'answerIds'
     );
 
   const dispatch = useDispatch();
@@ -32,7 +30,7 @@ export const App: FC = () => {
     const intervalId = setInterval(()=>{answerIds.length > 0 && dispatch(getVotes(answerIds))}, 5000);
 
     return () => clearInterval(intervalId);
-  }, [answerIds]);
+  }, [answerIds,dispatch]);
 
   return (
     <div className={styles.app}>

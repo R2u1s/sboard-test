@@ -22,14 +22,17 @@ export const Main: FC = () => {
     'questionsFailed'
   );
 
-  const [page,setPage] = useState<number>(0);
+  //реализация подгрузки списка вопросов по скроллу
+  const [page, setPage] = useState<number>(0);
 
   const loaderRef = useRef(null);
 
   useEffect(() => {
+    const currentObserverTarget = loaderRef.current;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && total > page*OFFSET) {
+        if (entries[0].isIntersecting && total > page * OFFSET) {
           setPage(prev => prev + 1);
           dispatch(getQuestionsAndIp(page + 1, OFFSET));
         }
@@ -37,16 +40,17 @@ export const Main: FC = () => {
       { threshold: 1.0 }
     );
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
+    if (currentObserverTarget) {
+      observer.observe(currentObserverTarget);
     }
 
     return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
+      if (currentObserverTarget) {
+        observer.unobserve(currentObserverTarget);
       }
     };
-  }, [dispatch,questions]);
+  }, [dispatch, questions, page, total]);
+  //////////////////////////////////////////////////
 
   // Мемоизируем список вопросов
   const memoizedQuestions = useMemo(() => {
@@ -56,7 +60,7 @@ export const Main: FC = () => {
         <Question question={item} />
       </li>
     )) : 'Не удалось найти вопросы';
-  }, [questions, questionsRequest, questionsSuccess]);
+  }, [questions]);
 
   return (
     <main className={styles.content}>

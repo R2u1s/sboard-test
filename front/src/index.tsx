@@ -7,7 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import { rootReducer } from './services/reducers';
 import { configureStore } from '@reduxjs/toolkit';
-import { BrowserRouter as Router } from 'react-router-dom';
 
 //thunk не добавляем, потому что он по умолчанию в toolkit есть
 export const store = configureStore({
@@ -23,10 +22,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      {/* Router используется для возможности запуска на виртуальном сервере, чтобы адрес был http://77.238.250.70/sboard/ */}
-      <Router basename="/sboard">
         <App />
-      </Router>
     </Provider>
   </React.StrictMode>
 );

@@ -2,7 +2,7 @@ import { FC, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from "./question.module.css";
 import { Line } from '../line/line';
 import { ArrowIcon } from '../ui/icons/arrow-icon';
-import { IQuestionProps, TId, TVotes } from '../../types/types';
+import { IQuestionProps, TId } from '../../types/types';
 import { filterVotesByAns, isAnswerCorrect, isQuestionAnswered } from '../../utils/helpers';
 import { Check } from '../check/check';
 import { Loader } from '../loader/loader';

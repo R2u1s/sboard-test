@@ -1,5 +1,5 @@
-/* export const API = 'http://localhost:3001/api'; */
-export const API = 'http://77.238.250.70/sboard/api';
+export const API = 'http://localhost:3001/api';
+/* export const API = 'http://77.238.250.70/sboard/api'; */
 export const URL_GET_API = 'https://api.ipify.org?format=json';
 export const OFFSET = 12;
 

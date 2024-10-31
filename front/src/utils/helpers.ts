@@ -82,7 +82,7 @@ export function transformQuestionsResponse(
 }
 
 //
-export function filterVotesByAns<T>(ans: TAnswer[], votes: TVotes): TVotes {
+export function filterVotesByAns(ans: TAnswer[], votes: TVotes): TVotes {
   const ids = ans.map(item => item.id_a);
   
   return Object.keys(votes)
