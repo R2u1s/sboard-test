@@ -39,7 +39,7 @@ export type TState = {
   message: TMessage,
   answerIds: TId[],
   prevVotesResponse: TVotes,
-  hightLightAnswerVote: TId[],
+  highlightAnswerVote: TId[],
   questionsRequest: boolean,
   questionsSuccess: boolean,
   questionsFailed: boolean,
@@ -72,7 +72,7 @@ const initialState: TState = {
   },
   answerIds: [],
   prevVotesResponse: {},
-  hightLightAnswerVote: [], //сохраняем сюда id ответов, для которых нужно подсветить изменившееся количество голосов
+  highlightAnswerVote: [], //сохраняем сюда id ответов, для которых нужно подсветить изменившееся количество голосов
   questionsRequest: false,
   questionsSuccess: false,
   questionsFailed: false,
@@ -289,7 +289,7 @@ export const storeReducer = (state = initialState, action: TStoreActions) => {
         return {
           ...state,
           prevVotesResponse: action.data,
-          hightLightAnswerVote:getDifferentKeys(state.prevVotesResponse,action.data), 
+          highlightAnswerVote:getDifferentKeys(state.prevVotesResponse,action.data), 
           votes: {...state.votes,...action.data},
           votesRequest: false,
           votesSuccess: true,
@@ -320,7 +320,7 @@ export const storeReducer = (state = initialState, action: TStoreActions) => {
     case CLEAR_HIGHLIGHT: {
       return {
         ...state,
-        hightLightAnswerVote: initialState.hightLightAnswerVote
+        highlightAnswerVote: initialState.highlightAnswerVote
       };
     }
     default: {

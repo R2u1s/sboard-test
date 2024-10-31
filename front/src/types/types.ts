@@ -10,6 +10,12 @@ export type TAnswer = {
   text_a: string;
 }
 
+export type TAnswerProps = {
+  answered:TId | null;
+  data:TAnswer;
+  question: IQuestion
+}
+
 export type TPostAnswerBody = {
   id_q: TId;
   id_a: TId;

@@ -1,15 +1,15 @@
-import { FC, useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { FC, useState, useCallback, useEffect } from 'react';
 import styles from "./question.module.css";
 import { Line } from '../line/line';
 import { ArrowIcon } from '../ui/icons/arrow-icon';
 import { IQuestionProps, TId } from '../../types/types';
-import { filterVotesByAns, isAnswerCorrect, isQuestionAnswered } from '../../utils/helpers';
-import { Check } from '../check/check';
+import { isAnswerCorrect, isQuestionAnswered } from '../../utils/helpers';
 import { Loader } from '../loader/loader';
 import { DeleteIcon } from '../ui/icons/delete-icon';
 import { useStore } from '../../services/hooks';
 import { useDispatch } from '../../services/hooks';
-import { postAnswer, deleteQuestion, addAnswerIdsList, removeAnswerIdsList, clearChosen, clearHighlight } from '../../services/actions/store';
+import { deleteQuestion, addAnswerIdsList, removeAnswerIdsList, clearChosen } from '../../services/actions/store';
+import { Answer } from '../answer/answer';
 
 export const Question: FC<IQuestionProps> = ({ question }) => {
 
@@ -17,49 +17,14 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
 
   const [show, setShow] = useState<boolean>(false);
   const [answered, setAnswered] = useState<TId | null>(isQuestionAnswered(question));
-  const [highlight, setHighlight] = useState<TId | null>(null);
 
-  const { questions, answerRequest, answerSuccess, ipUser, votes, chosen, deleteRequest, hightLightAnswerVote } = useStore(
+  const { questions, answerSuccess, ipUser, chosen, deleteRequest } = useStore(
     'questions',
-    'answerRequest',
     'answerSuccess',
-    'deleteRequest',
     'ipUser',
-    'votes',
     'chosen',
-    'hightLightAnswerVote'
+    'deleteRequest'
   );
-
-  //мемоизируем объект с голосами
-  const memoizedVotes = useMemo(() => {
-    return filterVotesByAns(question.ans, votes);
-  }, [question.ans, votes]);
-
-  // Сохраним предыдущие голоса для сравнения
-  const prevVotesRef = useRef(memoizedVotes);
-
-  //таймер - для стилизации изменяющегося количества голосов
-  useEffect(() => {
-    // Определяем id ответов, количество голосов которых изменилось
-    const changedVotes = hightLightAnswerVote.filter(id =>
-      prevVotesRef.current[id] !== memoizedVotes[id]
-    );
-  
-    if (changedVotes.length > 0) {
-      changedVotes.forEach(id => {
-        setHighlight(id);
-  
-        const timer = setTimeout(() => {
-          setHighlight(null);
-          dispatch(clearHighlight());
-        }, 300);
-  
-        return () => clearTimeout(timer);
-      });
-    }
-  
-    prevVotesRef.current = memoizedVotes;
-  }, [hightLightAnswerVote, memoizedVotes, dispatch]);
 
   const onExpandHandler = useCallback(() => {
     if (!show && answered) {
@@ -70,14 +35,6 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
     setShow(prev => !prev);
   }, [setShow, answered, dispatch, question.ans, show]);
 
-  const onAnswerClick = (id: TId) => {
-    dispatch(postAnswer({
-      id_q: question.id_q,
-      id_a: id,
-      ipUser: ipUser
-    }));
-    dispatch(addAnswerIdsList(question.ans.map(item => item.id_a)));
-  };
 
   const onDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -119,19 +76,7 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
       {question && question.ans && <ul className={`${styles.list} ${show ? styles.question_expanded_open : styles.question_expanded_close}`}>
         {question.ans.map((item) => {
           return (
-            <li className={styles.list__elem} key={item.id_a} onClick={() => { !answered && onAnswerClick(item.id_a) }}>
-              <Line
-                firstComponent={<Check isDone={answered === item.id_a} />}
-                secondComponent={
-                  <p className={`${styles.list__text} text text_type_medium ${answered === item.id_a && 'text_weight_bold text_type_active'}`}>
-                    {item.text_a}
-                  </p>}
-                thirdComponent={show &&
-                  <div className={`${styles.question__third} ${highlight === item.id_a && styles.question__vote_highlight} text text_type_main`}>
-                    {chosen === item.id_a && answerRequest ? <Loader extraClass={styles.loader__color} /> : answered && (memoizedVotes[item.id_a] || 0)}
-                  </div>}
-              />
-            </li>
+            <Answer answered={answered} data={item} question={question}/>
           )
         })}
       </ul>}
