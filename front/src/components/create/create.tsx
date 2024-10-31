@@ -64,7 +64,7 @@ export const Create: FC = () => {
   const createQuestion = () => {
     const objQuestion:TCreateQuestionBody = {
       text_q:values[INPUT_QUESTION_NAME],
-      ans:extractAnswers(values),
+      ans:extractAnswers(values).reverse(),
       ip:ipUser
     }
     dispatch(postQuestion(objQuestion,clearInputs));

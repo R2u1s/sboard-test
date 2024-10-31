@@ -2,7 +2,7 @@
   margin: 0 auto;
   padding: 0;
   width: 100%;
-  min-width: 470px;
+  min-width: 300npmpx;
   display: flex;
   background-color: white;
   flex-direction: column;
@@ -101,7 +101,7 @@
   display: flex;
   flex-flow: column;
   gap: 10px;
-  min-width: 470px;
+  min-width: 320px;
 }
 
 .list__elem {
@@ -133,7 +133,7 @@
   margin: 0;
   padding: 0;
   max-width: 560px;
-  min-width: 320px;
+  min-width: 180px;
   width: auto;
   box-sizing: border-box;
   word-wrap: break-word;

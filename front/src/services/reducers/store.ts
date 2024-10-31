@@ -275,15 +275,15 @@ export const storeReducer = (state = initialState, action: TStoreActions) => {
     }
     case VOTES_SUCCESS: {
       //меняем votes только если ответ сервера отличается от предыдущего
-      if (isEqual(state.prevVotesResponse, action.data) || Object.keys(state.prevVotesResponse).length === 0) {
-        return {
-          ...state,
-          prevVotesResponse: action.data,
-          votesRequest: false,
-          votesSuccess: true,
-          votesFailed: false
-        };
-      } else {
+      // if (isEqual(state.prevVotesResponse, action.data) || Object.keys(state.prevVotesResponse).length === 0) {
+      //   return {
+      //     ...state,
+      //     prevVotesResponse: action.data,
+      //     votesRequest: false,
+      //     votesSuccess: true,
+      //     votesFailed: false
+      //   };
+      // } else {
         return {
           ...state,
           prevVotesResponse: action.data,
@@ -294,8 +294,7 @@ export const storeReducer = (state = initialState, action: TStoreActions) => {
           votesFailed: false
         };
       }
-
-    }
+    // }
     case VOTES_FAILED: {
       return {
         ...state,

@@ -34,7 +34,7 @@ export const Main: FC = () => {
   /* ----------------------------------------------------------------------------------- */
 
   /* Реализация рендера по скроллу. 250 это высота блока над списком, 52 высота элемента списка */
-  const [qtyToShow, setQtyToShow] = useState<number>(Math.floor((windowHeight - 250) / 52));
+  const [qtyToShow, setQtyToShow] = useState<number>(Math.max(12, Math.floor((windowHeight - 250) / 52)));
 
   const handleScroll = useCallback((event: Event) => {
     const target = event.target as Document;

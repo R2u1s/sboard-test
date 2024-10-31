@@ -1,15 +1,15 @@
-import { FC, useState, useCallback, useEffect, useMemo } from 'react';
+import { FC, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from "./question.module.css";
 import { Line } from '../line/line';
 import { ArrowIcon } from '../ui/icons/arrow-icon';
-import { IQuestionProps, TId } from '../../types/types';
+import { IQuestionProps, TId, TVotes } from '../../types/types';
 import { filterVotesByAns, isAnswerCorrect, isQuestionAnswered } from '../../utils/helpers';
 import { Check } from '../check/check';
 import { Loader } from '../loader/loader';
 import { DeleteIcon } from '../ui/icons/delete-icon';
 import { useStore } from '../../services/hooks';
 import { useDispatch } from '../../services/hooks';
-import { postAnswer, deleteQuestion, addAnswerIdsList,removeAnswerIdsList, clearChosen, clearHighlight } from '../../services/actions/store';
+import { postAnswer, deleteQuestion, addAnswerIdsList, removeAnswerIdsList, clearChosen, clearHighlight } from '../../services/actions/store';
 
 export const Question: FC<IQuestionProps> = ({ question }) => {
 
@@ -17,9 +17,9 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
 
   const [show, setShow] = useState<boolean>(false);
   const [answered, setAnswered] = useState<TId | null>(isQuestionAnswered(question));
-  const [highlight, setHighlight] = useState<boolean>(false);
+  const [highlight, setHighlight] = useState<TId | null>(null);
 
-  const { questions, answerRequest, answerSuccess, ipUser, votes, chosen, deleteRequest,hightLightAnswerVote } = useStore(
+  const { questions, answerRequest, answerSuccess, ipUser, votes, chosen, deleteRequest, hightLightAnswerVote } = useStore(
     'questions',
     'answerRequest',
     'answerSuccess',
@@ -31,23 +31,35 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
   );
 
   //мемоизируем объект с голосами
-  const memoizedVotes = useMemo(()=>{
-    return filterVotesByAns(question.ans,votes);
-  },[question.ans,votes]);
+  const memoizedVotes = useMemo(() => {
+    return filterVotesByAns(question.ans, votes);
+  }, [question.ans, votes]);
+
+  // Сохраним предыдущие голоса для сравнения
+  const prevVotesRef = useRef(memoizedVotes);
 
   //таймер - для стилизации изменяющегося количества голосов
   useEffect(() => {
-    if (hightLightAnswerVote.length > 0) {
-      setHighlight(true);
-
-      const timer = setTimeout(() => {
-        setHighlight(false);
-        dispatch(clearHighlight());
-      }, 300);
-
-      return () => clearTimeout(timer);
+    // Определяем id ответов, количество голосов которых изменилось
+    const changedVotes = hightLightAnswerVote.filter(id =>
+      prevVotesRef.current[id] !== memoizedVotes[id]
+    );
+  
+    if (changedVotes.length > 0) {
+      changedVotes.forEach(id => {
+        setHighlight(id);
+  
+        const timer = setTimeout(() => {
+          setHighlight(null);
+          dispatch(clearHighlight());
+        }, 300);
+  
+        return () => clearTimeout(timer);
+      });
     }
-  }, [hightLightAnswerVote, dispatch]);
+  
+    prevVotesRef.current = memoizedVotes;
+  }, [hightLightAnswerVote, memoizedVotes, dispatch]);
 
   const onExpandHandler = useCallback(() => {
     if (!show && answered) {
@@ -56,7 +68,7 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
       dispatch(removeAnswerIdsList(question.ans.map(item => item.id_a)));
     }
     setShow(prev => !prev);
-  }, [setShow,answered,dispatch,question.ans,show]);
+  }, [setShow, answered, dispatch, question.ans, show]);
 
   const onAnswerClick = (id: TId) => {
     dispatch(postAnswer({
@@ -64,11 +76,12 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
       id_a: id,
       ipUser: ipUser
     }));
+    dispatch(addAnswerIdsList(question.ans.map(item => item.id_a)));
   };
 
-  const onDeleteClick = (e:React.MouseEvent<HTMLButtonElement>) => {
+  const onDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    question.owner && dispatch(deleteQuestion(question.id_q,ipUser));
+    question.owner && dispatch(deleteQuestion(question.id_q, ipUser));
   }
 
   useEffect(() => {
@@ -81,9 +94,9 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
       if (isAnswerCorrect(questions, question.id_q, chosen)) {
         setAnswered(isQuestionAnswered(question));
         dispatch(clearChosen());
-      } 
+      }
     }
-  }, [questions,answerSuccess,chosen,question,dispatch]);
+  }, [questions, answerSuccess, chosen, question, dispatch]);
 
   return (
     <div className={`${styles.question} ${answered && styles.question_status_answered}`}>
@@ -113,8 +126,8 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
                   <p className={`${styles.list__text} text text_type_medium ${answered === item.id_a && 'text_weight_bold text_type_active'}`}>
                     {item.text_a}
                   </p>}
-                thirdComponent={show && 
-                  <div className={`${styles.question__third} ${highlight && hightLightAnswerVote.includes(item.id_a) && styles.question__vote_highlight} text text_type_main`}>
+                thirdComponent={show &&
+                  <div className={`${styles.question__third} ${highlight === item.id_a && styles.question__vote_highlight} text text_type_main`}>
                     {chosen === item.id_a && answerRequest ? <Loader extraClass={styles.loader__color} /> : answered && (memoizedVotes[item.id_a] || 0)}
                   </div>}
               />

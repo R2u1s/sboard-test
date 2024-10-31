@@ -52,7 +52,7 @@ export function extractAnswers(input: TInputValues): string[] {
     }
   }
 
-  return answers;
+  return answers.reverse();
 }
 
 export function transformAnswerResponse(inputArray: IApiResponseAnswer[]): TAnswer[] {
@@ -62,6 +62,7 @@ export function transformAnswerResponse(inputArray: IApiResponseAnswer[]): TAnsw
   }));
 }
 
+//
 export function filterVotesByAns<T>(ans: TAnswer[], votes: TVotes): TVotes {
   const ids = ans.map(item => item.id_a);
   

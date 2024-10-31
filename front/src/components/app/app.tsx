@@ -34,7 +34,7 @@ export const App: FC = () => {
         <h1 className={styles.title}>sBoard test</h1>
       </header>
       <Main />
-      {/* {message.text.length > 0 && <Modal content={message} clearCallback={() => { dispatch(clearMessage()) }} />} */}
+      {message.text.length > 0 && <Modal content={message} clearCallback={() => { dispatch(clearMessage()) }} />}
     </div>
   );
 }
