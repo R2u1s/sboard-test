@@ -77,7 +77,7 @@ export class PollsService {
     //в ответ отправляем объект с количеством голосов в рамках данного вопроса и
     //объектом вопроса, с идентификатором выбранного ответа
     //по-хорошему нужно в отдельную функцию вынести
-    const answers = await this.answersRepository.find({ where: { id: id_a, poll: { id: id_q } } });
+    const answers = await this.answersRepository.find({ where: { poll: { id: id_q } } });
     const votesTemp = {};
 
     for (const answer of answers) {
