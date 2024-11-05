@@ -159,6 +159,7 @@ export const storeReducer = (state = initialState, action: TStoreActions) => {
       };
     }
     case ANSWER_SUCCESS: {
+      console.log(action.data);
       return {
         ...state,
         answerRequest: false,

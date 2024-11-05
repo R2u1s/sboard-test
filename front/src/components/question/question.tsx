@@ -32,8 +32,9 @@ export const Question: FC<IQuestionProps> = ({ question }) => {
 
   //мемоизируем объект с голосами
   const memoizedVotes = useMemo(() => {
+    console.log(votes);
     return filterVotesByAns(question.ans, votes);
-  }, [question.ans, votes]);
+  }, [question.ans, votes, answerSuccess]);
 
   // Сохраним предыдущие голоса для сравнения
   const prevVotesRef = useRef(memoizedVotes);
